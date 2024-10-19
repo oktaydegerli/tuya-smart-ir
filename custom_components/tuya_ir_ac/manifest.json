@@ -1,0 +1,11 @@
+{
+  "domain": "tuya_smart_ir",
+  "name": "Tuya Smart IR",
+  "version": "0.0.1",
+  "dependencies": [],
+  "codeowners": ["@oktaydegerli"],
+  "requirements": [
+    "tinytuya~=1.15.1"
+  ],
+  "config_flow": true
+}
