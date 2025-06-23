@@ -10,6 +10,8 @@ CONF_TEMPERATURE_SENSOR = "temperature_sensor"
 DEVICE_MODELS = {
     "MSZ-GE25VA": "MSZ-GE25VA",    
     "MSC-GE35VB": "MSC-GE35VB",
+    "MSZ-GE25VA-v2": "MSZ-GE25VA-v2",
+    "MSC-GE35VB-v2": "MSC-GE35VB-v2",
 }
 
 DEVICE_VERSIONS = {
