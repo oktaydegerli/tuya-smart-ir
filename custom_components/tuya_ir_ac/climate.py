@@ -245,7 +245,7 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
                 else:
                     head = ""
                     key = ir_code
-                await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":300})})
+                await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":0})})
             else:
                 await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
         except Exception as e:
