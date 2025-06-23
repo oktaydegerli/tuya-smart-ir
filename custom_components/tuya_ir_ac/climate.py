@@ -238,8 +238,13 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
 
         try:
             if self._device_model in ["MSZ-GE25VA-v2", "MSC-GE35VB-v2"]:
-                head = "010ed8000000000005000f003500260045008c"
-                key = "001^%0070C4D364800024C0E04000000000A2@$"
+                if '*' in ir_code:
+                    parts = ir_code.split('*', 1)
+                    head = parts[0]
+                    key = parts[1]
+                else:
+                    head = ""
+                    key = ir_code
                 await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":300})})
             else:
                 await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
