@@ -244,7 +244,7 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
             else:
                 await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
         except Exception as e:
-            _LOGGER.error(f"Durum ayarlama hatası: {e}")
+            _LOGGER.error(f"Durum ayarlama hatası: {self._device_model} - {e}")
 
 
     async def _async_send_command(self, command):
