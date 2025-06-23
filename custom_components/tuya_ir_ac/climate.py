@@ -237,14 +237,11 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
             return
 
         try:
-            if self._device_model is "MSZ-GE25VA-v2" or self._device_model is "MSC-GE35VB-v2":
-                _LOGGER.error(f"v2 gönderim...")
-                await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
-                # head = "010ed8000000000005000f003500260045008c"
-                # key = "001^%0070C4D364800024C0E04000000000A2@$"
-                # await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":300})})
+            if self._device_model in ["MSZ-GE25VA-v2", "MSC-GE35VB-v2"]:
+                head = "010ed8000000000005000f003500260045008c"
+                key = "001^%0070C4D364800024C0E04000000000A2@$"
+                await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":300})})
             else:
-                _LOGGER.error(f"v1 gönderim...")
                 await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
         except Exception as e:
             _LOGGER.error(f"Durum ayarlama hatası: {e}")
