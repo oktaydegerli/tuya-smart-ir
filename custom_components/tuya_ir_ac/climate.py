@@ -45,7 +45,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     
     try:
         device = await hass.async_add_executor_job(tinytuya.Device, device_id, device_ip, device_local_key, "default", 5, device_version)
-        entity = TuyaIrClimateEntity(hass, f"{device_id}", ac_name, device, temperature_sensor)
+        entity = TuyaIrClimateEntity(hass, f"{device_id}", ac_name, device, temperature_sensor, device_model)
 
         commands_path = os.path.join(hass.config.path(), "custom_components", DOMAIN, f'{device_model}.json')
         entity._ir_codes = await entity.async_load_ir_codes(commands_path)
@@ -58,13 +58,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     
 
 class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
-    def __init__(self, hass, unique_id, ac_name, device, temperature_sensor):
+    def __init__(self, hass, unique_id, ac_name, device, temperature_sensor, device_model):
         self._enable_turn_on_off_backwards_compatibility = False
         self.hass = hass
         self._ac_name = ac_name
         self._attr_unique_id = unique_id
         self._device = device
         self._temperature_sensor = temperature_sensor
+        self._device_model = device_model
         self._attr_hvac_mode = HVACMode.OFF
         self._attr_fan_mode = "Orta"
         self._attr_target_temperature = 22
@@ -235,11 +236,13 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
             _LOGGER.error(f"Geçersiz HVAC modu, fan modu veya hedef sıcaklık kombinasyonu.")
             return
 
-        b64 = codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()
-        command = {"1": "study_key", "7": b64}
-
         try:
-            await self._async_send_command(command)
+            if self._device_model is "MSZ-GE25VA-v2" or self._device_model is "MSC-GE35VB-v2":
+                head = "010ed8000000000005000f003500260045008c"
+                key = "001^%0070C4D364800024C0E04000000000A2@$"
+                await self._async_send_command({"201": json.dumps({"control": "send_ir", "head": head, "key1": key, "type": 0, "delay":300})})
+            else:
+                await self._async_send_command({"1": "study_key", "7": codecs.encode(codecs.decode(ir_code, 'hex'), 'base64').decode()})
         except Exception as e:
             _LOGGER.error(f"Durum ayarlama hatası: {e}")
 
@@ -250,3 +253,4 @@ class TuyaIrClimateEntity(ClimateEntity, RestoreEntity):
             await self.hass.async_add_executor_job(self._device.send, payload) # self._device kullan
         except Exception as e:
             _LOGGER.error(f"Komut gönderme hatası: {e}")
+            
